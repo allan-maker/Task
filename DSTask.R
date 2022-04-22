@@ -7,6 +7,10 @@ library(lubridate)
 library(dplyr)
 library(tidyverse)
 library(tidyr)
+library(billboarder)
+
+install.packages("pacman")
+install.packages("rcdimple")
 
 ########## Read in the data from GitHub and save it as data_all ###################################
 url <- "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/data_all.csv"
@@ -53,4 +57,7 @@ monthyly_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_de
                                     name, data2 , mean, na.rm = TRUE)
 quartely_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ quarterly + 
                                     name, data2 , mean, na.rm = TRUE)
+
+
+
 

@@ -4,11 +4,45 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(ggplot2)
+pacman::p_load(flexdashboard, rcdimple, DT)
+
+library(lubridate)
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(billboarder)
+library(shiny)
+
+url <- "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/data_all.csv"
+data <- read.csv(url)
+
+data2 <- data
+attach(data2)
+
+data2$time<-as.Date(data2$time)
+class(data2$time)
+
+data2$monthly <- strftime(data2$time, "%Y-%m")
+data2$quarterly <- paste0(year(data2$time),
+                         "-0",
+                         quarter(data2$time))
+
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+### Select
+
+```{r}
+selectInput("FilterCountry", "Filter Country", choices = name, multiple = T)
+
 ```
 
 Column {data-width=650}
@@ -17,23 +51,36 @@ Column {data-width=650}
 ### Chart A
 
 ```{r}
-ggplot(data2, aes(x=name, y=cap_new_tests))+
-  geom_point()
+data2 %>%
+  group_by(time, name, new_tests_orig) %>%
+  summarize(n = n())
 
 ```
 
-Column {data-width=350}
+Column {data-width=450}
 -----------------------------------------------------------------------
 
 ### Chart B
 
 ```{r}
+data2 %>%
+  group_by(time, name, new_tests_orig) %>%
+  summarize(n = n())
 
 ```
 
 ### Chart C
 
 ```{r}
+
+monthyly_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ monthly + 
+                                    name, data2 , mean, na.rm = TRUE)
+quartely_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ quarterly + 
+                                    name, data2 , mean, na.rm = TRUE)
+
+renderDataTable(
+  monthyly_average1000
+)
 
 ```
 
