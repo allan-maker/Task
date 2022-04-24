@@ -62,6 +62,7 @@ days_deaths_reported_monthly <- data2 %>% group_by(monthly, name) %>%
   filter(new_deaths_orig > 0) %>%
   summarise(frequency = n())
 
+
 ########### Number of days by Quarter  #######################
 
 days_tests_reported_quarterly <- data2 %>% group_by(quarterly, name) %>%
@@ -76,18 +77,21 @@ days_deaths_reported_quarterly <- data2 %>% group_by(quarterly, name) %>%
   filter(new_deaths_orig > 0) %>%
   summarise(frequency = n())
 
-############ Calculating the monthly and quarterly average tests, cases and deaths ##############
+allData_days <- list(days_tests_reported_monthly, days_cases_reported_monthly, days_deaths_reported_monthly) %>% 
+  reduce(left_join, by = "name")
+
+############ Calculating the monthly and quarterly average tests, cases and deaths ##################
 
 class(cap_new_tests)
 class(cap_new_cases)
 class(cap_new_deaths)
 
-monthyly_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ monthly + 
+monthly_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ monthly + 
                                     name, data2 , mean, na.rm = TRUE)
 quartely_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_deaths) ~ quarterly + 
                                     name, data2 , mean, na.rm = TRUE)
 
-############ Boxplots ###########################################################################
+############ Boxplots ###############################################################################
 
-plot_ly(data = monthyly_average1000, x = name, y = cap_new_deaths, type = "box", boxpoints = "all", jitter = 0.3,
+plot_ly(data = monthly_average1000, x = name, y = cap_new_deaths, type = "box", boxpoints = "all", jitter = 0.3,
         pointpos = -1.8)
