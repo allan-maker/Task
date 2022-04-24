@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 
 ########## Read in the data from GitHub and save it as data_all ######################################
 
@@ -79,6 +80,7 @@ quartely_average1000 <- aggregate(cbind(cap_new_tests, cap_new_cases, cap_new_de
 ############### Generate the data #########################################################
 
 write.csv(data_all,"C:\\Users\\aabala\\Desktop\\Task\\data_all.csv", row.names = FALSE)
+write.csv(data2,"C:\\Users\\aabala\\Desktop\\Task\\data2.csv", row.names = FALSE)
 write.csv(days_tests_reported_monthly,"C:\\Users\\aabala\\Desktop\\Task\\days_tests_reported_monthly.csv", row.names = FALSE)
 write.csv(days_cases_reported_monthly,"C:\\Users\\aabala\\Desktop\\Task\\days_cases_reported_monthly.csv", row.names = FALSE)
 write.csv(days_deaths_reported_monthly,"C:\\Users\\aabala\\Desktop\\Task\\days_deaths_reported_monthly.csv", row.names = FALSE)
