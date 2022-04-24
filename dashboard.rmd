@@ -12,39 +12,200 @@ runtime: shiny
 library(flexdashboard)
 ```
 
+```{r}
+library(leaflet)
+library(htmltools)
+library(plotly)
+library(tidyverse)
+library(DT)
+
+############### set working directory of localhost (shinyio can be commented #################
+setwd("C:/Users/aabala/Desktop/Task")
+
+############### call all the generated CSV files ####################
+
+data2 <- read.csv("data2.csv", sep = ",")
+days_tests_reported_monthly <- read.csv("days_tests_reported_monthly.csv", sep = ",")
+days_cases_reported_monthly <- read.csv("days_cases_reported_monthly.csv", sep = ",")
+days_deaths_reported_monthly <- read.csv("days_tests_reported_monthly.csv", sep = ",")
+days_tests_reported_quarterly <- read.csv("days_tests_reported_quarterly.csv", sep = ",")
+days_cases_reported_quarterly <- read.csv("days_cases_reported_quarterly.csv", sep = ",")
+days_deaths_reported_quarterly <- read.csv("days_deaths_reported_quarterly.csv", sep = ",")
+monthly_average1000 <- read.csv("monthly_average1000.csv", sep = ",")
+quartely_average1000 <- read.csv("quartely_average1000.csv", sep = ",")
+
+############### Plot the boxplot chat for one of the calculated metrics ###############
+
+fig1 <- plot_ly() %>% 
+  
+  add_trace(data = monthly_average1000, x = monthly_average1000$name, y = monthly_average1000$cap_new_tests, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8, name = "Avg test rate per1000/month") %>%
+  
+  add_trace(data = monthly_average1000, x = monthly_average1000$name, y = monthly_average1000$cap_new_cases, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8, name = "Avg case rate per1000/month") %>%
+  
+  add_trace(data = monthly_average1000, x = monthly_average1000$name, y = monthly_average1000$cap_new_deaths, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8, name = "Avg death rate per1000/month") %>%
+  
+  layout(
+          updatemenus = list(
+            list(
+                type = "list",
+                label = 'Category',
+                buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "Avg test rate per1000/month"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "Avg case rate per1000/month"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, FALSE, TRUE)),
+               label = "Avg case rate per1000/month"))
+      )
+    )
+  ) %>%
+  
+  layout(
+        yaxis = list(title = "",
+                     categoryorder = "array",
+                     categoryarray = ~name))
+
+############### create the table for the number of days for tests, cases and deaths ###############
+
+fig2 <- plot_ly() %>%
+  
+  add_trace(type = "table", header = list(
+    values = c("<b>Number</b>", names(days_tests_reported_monthly)),
+  align = c('left', rep('center', ncol(days_tests_reported_monthly))),
+  line = list(width = 1, color = 'black'),
+  fill = list(color = 'rgb(235, 100, 230)'),
+  font = list(family = "Arial", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(
+      rownames(days_tests_reported_monthly), 
+      t(as.matrix(unname(days_tests_reported_monthly)))
+    ),
+    align = c('left', rep('center', ncol(days_tests_reported_monthly))),
+    line = list(color = "black", width = 1),
+    fill = list(color = c('rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)')),
+    font = list(family = "Arial", size = 12, color = c("black"))
+  )) %>%
+  
+  layout(
+          updatemenus = list(
+            list(
+                type = "list",
+                label = 'Category',
+                buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "Number of Days Tests Reported"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "Number of Days Cases Reported"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, FALSE, TRUE)),
+               label = "Number of Days Deaths Reported"))
+      )
+    )
+  )
+
+fig3 <- plot_ly() %>%
+  
+  add_trace(type = "table", header = list(
+    values = c("<b>Number</b>", names(quartely_average1000)),
+  align = c('left', rep('center', ncol(quartely_average1000))),
+  line = list(width = 1, color = 'black'),
+  fill = list(color = 'rgb(235, 100, 230)'),
+  font = list(family = "Arial", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(
+      rownames(quartely_average1000), 
+      t(as.matrix(unname(quartely_average1000)))
+    ),
+    align = c('left', rep('center', ncol(quartely_average1000))),
+    line = list(color = "black", width = 1),
+    fill = list(color = c('rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)')),
+    font = list(family = "Arial", size = 12, color = c("black"))
+  )) %>%
+  
+  layout(
+          updatemenus = list(
+            list(
+                type = "list",
+                label = 'Category',
+                buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "Average Tests per 1000 People"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "Average Cases per 1000 People"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, FALSE, TRUE)),
+               label = "Average deaths per 1000 People"))
+      )
+    )
+  )
+
+```
+
 Country Status by Key Metric
 =========================================
 
 ### Frame 1 {data-commentary-width=400}
 
 ```{r}
+renderPlotly({
+  
+  fig1
+  
+  })
 
 ```
 
-Monthly and Quarterly Status {data-orientation=columns}
+Monthly and Quarterly Status {data-orientation=rows}
 =========================================
 
-Row {data-height=650}
+Row {.tabset .tabset-fade}
 -----------------------------------------
 
-### Number of Days Tests, Cases and Deaths Reports
+### Raw Data Set with Monthly and Quarterly Parameters 
 
 ```{r}
+DT::renderDataTable({DT::datatable(
+  
+  data2, filter = "top", caption = 'Number of Days Tests reported', options = list(scrollx = TRUE, scrolly = TRUE, pageLength = 10, lengthChange = F)
+  
+)})
 
 ```
 
 Row {data-height=350}
 -----------------------------------------
 
-### Monthly
+### Number of Days Tests, Cases and Deaths Reported
 
 ```{r}
+renderPlotly({
+  
+  fig2
+  
+  })
 
 ```
 
-### Quarterly
+### Average Quarterly Tests, Cases and Deaths Per 1000 People
 
 ```{r}
+renderPlotly({
+  
+  fig3
+  
+  })
 
 ```
 
