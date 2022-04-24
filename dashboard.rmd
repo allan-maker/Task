@@ -18,6 +18,7 @@ library(tidyverse)
 library(tidyr)
 library(billboarder)
 library(shiny)
+library(plotly)
 
 url <- "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/data_all.csv"
 data <- read.csv(url)
@@ -51,9 +52,8 @@ Column {data-width=650}
 ### Chart A
 
 ```{r}
-data2 %>%
-  group_by(time, name, new_tests_orig) %>%
-  summarize(n = n())
+plot_ly(data = data2, x = set, y = cap_new_deaths, type = "box", boxpoints = "all", jitter = 0.3,
+        pointpos = -1.8)
 
 ```
 
